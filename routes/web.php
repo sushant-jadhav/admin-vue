@@ -31,6 +31,7 @@ Route::get('/sign', 'App\SignatureController@create')->name('sign');
 
 Route::prefix('api')->namespace('Api')->group(function(){
     Route::get('/student','StudentController@getAllStudents');
+    Route::post('/student/store','StudentController@storeStudent');
 });
 
 

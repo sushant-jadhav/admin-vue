@@ -11,6 +11,8 @@ class StudentController extends Controller
     public function getAllStudents(){
         try{
 
+            
+
 
 
         }catch(\Exception $e){

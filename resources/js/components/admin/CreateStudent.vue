@@ -3,12 +3,8 @@
     <!-- column -->
     <div class="col-md-12">
       <div class="card">
-        <form
-          class="form-horizontal"
-          id="signup-form"
-          @submit.prevent="processForm"
-          novalidate="true"
-        >
+        <loading :active.sync="isLoading" :can-cancel="true" :is-full-page="fullPage"></loading>
+        <form id="signup-form" @submit.prevent="processForm" novalidate="true">
           <div class="card-body">
             <h4 class="card-title">Student Info</h4>
             <div class="form-group row">
@@ -209,6 +205,9 @@
 import Vuelidate from "vuelidate";
 import { required, minLength, email, Number } from "vuelidate/lib/validators";
 const isPhone = value => /^1(3|4|5|7|8)\d{9}$/.test(value);
+import Loading from "vue-loading-overlay";
+// Import stylesheet
+import "vue-loading-overlay/dist/vue-loading.css";
 export default {
   // Our Javascript logic
 
@@ -220,8 +219,13 @@ export default {
       password: "",
       contact_number: "",
       testTypes: [],
-      submitStatus: null
+      submitStatus: null,
+      isLoading: false,
+      fullPage: true
     };
+  },
+  components: {
+    Loading
   },
   validations: function() {
     return {
@@ -249,6 +253,7 @@ export default {
   methods: {
     processForm: function() {
       this.$v.$touch();
+      this.isLoading = true;
       let studentInfo = {
         first_name: this.first_name,
         last_name: this.last_name,
@@ -265,9 +270,20 @@ export default {
         console.log(studentInfo, this.$v.$invalid);
         this.submitStatus = "PENDING";
         console.log("Processing!");
-        setTimeout(() => {
-          this.submitStatus = "OK";
-        }, 500);
+        axios
+          .post("/api/student/store", {
+            body: studentInfo
+          })
+          .then(result => {
+            console.log(result);
+            this.isLoading = false;
+            this.submitStatus = "OK";
+          })
+          .catch(err => {
+            this.submitStatus = "OK";
+            this.isLoading = false;
+          });
+        this.isLoading = false;
       }
     },
     status(validation) {
